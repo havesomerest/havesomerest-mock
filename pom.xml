@@ -11,7 +11,7 @@
     <groupId>hu.hevi</groupId>
     <name>Spring Boot Integration Sample</name>
     <description>Spring Boot Integration Sample</description>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
     <url>http://projects.spring.io/spring-boot/</url>
 
     <properties>
@@ -19,6 +19,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>hu.hevi</groupId>
+            <artifactId>havesomerest-io</artifactId>
+            <version>1.1.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -33,6 +38,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20160212</version>
         </dependency>
     </dependencies>
 

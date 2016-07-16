@@ -6,7 +6,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @EnableAutoConfiguration
-@ComponentScan
+@ComponentScan("hu.hevi.havesomerest")
 public class SampleIntegrationApplication {
 
 	public static void main(String[] args) throws Exception {
