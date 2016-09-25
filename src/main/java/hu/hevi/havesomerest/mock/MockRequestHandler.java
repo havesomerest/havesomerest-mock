@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,7 +32,8 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
                                                   .collect(Collectors.toList());
 
         if (testsMatchedMethod.size() > 0) {
-            Test test = testsMatchedMethod.get(0);
+            int randomTest = ThreadLocalRandom.current().nextInt(0, testsMatchedMethod.size() - 1);
+            Test test = testsMatchedMethod.get(randomTest);
 
 
 
