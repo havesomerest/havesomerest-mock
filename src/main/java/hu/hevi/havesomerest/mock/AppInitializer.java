@@ -30,7 +30,6 @@ public class AppInitializer extends SimpleUrlHandlerMapping {
 
     @Override
     public void initApplicationContext() throws BeansException {
-        System.out.println("GETHANDLER");
         Map<String, Object> urlMap = (Map<String, Object>) this.getUrlMap();
 
         Map<Path, Optional<TestDirectory>> filesByDirectory = null;
@@ -42,10 +41,13 @@ public class AppInitializer extends SimpleUrlHandlerMapping {
         Map<Test, JSONObject> tests = toTestConverter.convert(filesByDirectory);
 
         tests.keySet().forEach(test -> {
-            log.info(test.toString());
-            String endPoint = endPointNameBuilder.build(test);
-            log.info("endpoint:::: " + endPoint);
-            urlMap.put(endPoint, new MockRequestHandler(test));
+            String endPoint = endPointNameBuilder.build(test.getEndpointParts());
+            if (urlMap.containsKey(endPoint)) {
+                MockRequestHandler requestHandler = (MockRequestHandler) urlMap.get(endPoint);
+                requestHandler.addTest(test);
+            } else {
+                urlMap.put(endPoint, new MockRequestHandler(test));
+            }
         });
 
         this.registerHandlers(urlMap);
