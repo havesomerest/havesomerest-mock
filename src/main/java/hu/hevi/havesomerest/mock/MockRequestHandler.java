@@ -32,8 +32,11 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
                                                   .collect(Collectors.toList());
 
         if (testsMatchedMethod.size() > 0) {
-            int randomTest = ThreadLocalRandom.current().nextInt(0, testsMatchedMethod.size() - 1);
-            Test test = testsMatchedMethod.get(randomTest);
+            int testToRun = 0;
+            if (testsMatchedMethod.size() > 1) {
+                testToRun = ThreadLocalRandom.current().nextInt(0, testsMatchedMethod.size() - 1);
+            }
+            Test test = testsMatchedMethod.get(testToRun);
 
 
 
