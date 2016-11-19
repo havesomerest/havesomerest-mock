@@ -11,8 +11,8 @@ public class SampleIntegrationApplication {
 
 	public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext ctx = SpringApplication.run(SampleIntegrationApplication.class, args);
-//        ApplicationRunner applicationRunner = (ApplicationRunner) ctx.getBean(ApplicationRunner.class);
-//        applicationRunner.run();
+        TcpConnectionService tcpConnectionService = ctx.getBean(TcpConnectionService.class);
+        tcpConnectionService.run();
     }
 
 }

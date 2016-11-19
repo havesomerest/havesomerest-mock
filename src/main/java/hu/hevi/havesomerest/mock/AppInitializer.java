@@ -51,5 +51,6 @@ public class AppInitializer extends SimpleUrlHandlerMapping {
         });
 
         this.registerHandlers(urlMap);
+
     }
 }
