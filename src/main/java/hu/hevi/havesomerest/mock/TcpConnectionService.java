@@ -25,6 +25,7 @@ public class TcpConnectionService implements Runnable {
             log.info("A socket for the Glorious Terminal has been initialized on port: " + serverSocket.getLocalPort());
 
             Socket clientSocket = serverSocket.accept();
+            log.info("Awesome Client has connected to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
             PrintWriter out =
                     new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(
@@ -34,9 +35,12 @@ public class TcpConnectionService implements Runnable {
             String inputLine, outputLine;
 
             while ((inputLine = in.readLine()) != null) {
+                log.info("Interesting news! " + clientSocket.getRemoteSocketAddress() + " has just announced: " + inputLine);
                 outputLine = inputLine.toUpperCase();
                 out.println(outputLine);
                 if (inputLine.equals("Bye."))
+                    log.info("Awesome Client says Good Bye to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
+                    clientSocket.close();
                     break;
             }
         } catch (IOException e) {
