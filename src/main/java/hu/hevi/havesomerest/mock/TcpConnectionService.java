@@ -1,6 +1,9 @@
 package hu.hevi.havesomerest.mock;
 
+import hu.hevi.havesomerest.test.Test;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -9,12 +12,17 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
 public class TcpConnectionService implements Runnable {
 
     public static final int PORT = 4444;
+
+    @Autowired
+    private UrlMappingRepostitory urlMappingRepostitory;
 
     @Override
     public void run() {
@@ -32,11 +40,22 @@ public class TcpConnectionService implements Runnable {
                     new InputStreamReader(clientSocket.getInputStream()));
 
 
-            String inputLine, outputLine;
+            String inputLine, outputLine = "";
 
             while ((inputLine = in.readLine()) != null) {
                 log.info("Interesting news! " + clientSocket.getRemoteSocketAddress() + " has just announced: " + inputLine);
-                outputLine = inputLine.toUpperCase();
+
+                if (inputLine.startsWith("getrequest:")) {
+                    String urlMapping = inputLine.replace("getrequest:", "");
+                    Optional<List<Test>> mapping = urlMappingRepostitory.getUrlMapping(urlMapping);
+                    if (mapping.isPresent()) {
+                        List<Test> tests = mapping.get();
+                        Test test = tests.get(0);
+                        outputLine = new JSONObject(test).toString();
+                    }
+                } else {
+                    outputLine = inputLine.toUpperCase();
+                }
                 out.println(outputLine);
                 if (inputLine.equals("Bye."))
                     log.info("Awesome Client says Good Bye to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());

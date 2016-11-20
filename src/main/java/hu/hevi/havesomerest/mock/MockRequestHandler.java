@@ -1,6 +1,7 @@
 package hu.hevi.havesomerest.mock;
 
 import hu.hevi.havesomerest.test.Test;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MockRequestHandler extends ResourceHttpRequestHandler {
 
+    @Getter
     private List<Test> tests = new ArrayList<>();
 
     public MockRequestHandler(Test test) {
@@ -26,6 +29,22 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        log.info(request.getHeaderNames().toString());
+
+        String requestBody = "";
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
+            requestBody = request.getReader()
+                                 .lines()
+                                 .collect(Collectors.joining(System.lineSeparator()));
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(LocalDateTime.now() + "\n" + request.getRequestURI() + "\n");
+            sb.append("------------------------\n");
+            sb.append(requestBody + "\n");
+            sb.append("------------------------\n");
+            log.info(sb.toString());
+        }
 
         List<Test> testsMatchedMethod = this.tests.stream()
                                                   .filter(t -> t.getMethod().equals(HttpMethod.valueOf(request.getMethod())))
@@ -37,6 +56,7 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
                 testToRun = ThreadLocalRandom.current().nextInt(0, testsMatchedMethod.size() - 1);
             }
             Test test = testsMatchedMethod.get(testToRun);
+
 
 
 
