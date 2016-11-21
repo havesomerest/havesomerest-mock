@@ -3,6 +3,7 @@ package hu.hevi.havesomerest.mock;
 import hu.hevi.havesomerest.test.Test;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
@@ -12,13 +13,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class MockRequestHandler extends ResourceHttpRequestHandler {
+
+    @Autowired
+    private RequestRepository requestRepository;
 
     @Getter
     private List<Test> tests = new ArrayList<>();
@@ -30,7 +33,17 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
         log.info(request.getHeaderNames().toString());
+
+        Map<String, String> headerByHeaderName = new HashMap<>();
+        Enumeration requestHeaderNames = request.getHeaderNames();
+        while (requestHeaderNames.hasMoreElements()) {
+            String headerName = (String) requestHeaderNames.nextElement();
+            String header = request.getHeader(headerName);
+            headerByHeaderName.put(headerName, header);
+            log.info(headerName + ": " + header);
+        }
 
         String requestBody = "";
         if ("POST".equalsIgnoreCase(request.getMethod())) {
@@ -45,6 +58,12 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
             sb.append("------------------------\n");
             log.info(sb.toString());
         }
+
+        AcceptedRequest acceptedRequest = AcceptedRequest.builder()
+                                                         .requestHeaders(headerByHeaderName)
+                                                         .requestBody(requestBody)
+                                                         .build();
+        requestRepository.save(acceptedRequest);
 
         List<Test> testsMatchedMethod = this.tests.stream()
                                                   .filter(t -> t.getMethod().equals(HttpMethod.valueOf(request.getMethod())))

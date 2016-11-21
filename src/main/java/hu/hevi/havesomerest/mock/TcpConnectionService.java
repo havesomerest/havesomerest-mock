@@ -23,6 +23,8 @@ public class TcpConnectionService implements Runnable {
 
     @Autowired
     private UrlMappingRepostitory urlMappingRepostitory;
+    @Autowired
+    private RequestRepository requestRepository;
 
     @Override
     public void run() {
@@ -46,13 +48,15 @@ public class TcpConnectionService implements Runnable {
                 log.info("Interesting news! " + clientSocket.getRemoteSocketAddress() + " has just announced: " + inputLine);
 
                 if (inputLine.startsWith("getrequest:")) {
-                    String urlMapping = inputLine.replace("getrequest:", "");
+                    String urlMapping = inputLine.replace("getrequests:", "");
                     Optional<List<Test>> mapping = urlMappingRepostitory.getUrlMapping(urlMapping);
                     if (mapping.isPresent()) {
                         List<Test> tests = mapping.get();
                         Test test = tests.get(0);
                         outputLine = new JSONObject(test).toString();
                     }
+                } else if (inputLine.startsWith("getrequest[")) {
+
                 } else {
                     outputLine = inputLine.toUpperCase();
                 }
