@@ -1,5 +1,6 @@
 package hu.hevi.havesomerest.mock;
 
+import hu.hevi.havesomerest.test.Test;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -51,7 +54,7 @@ public class TcpConnectionService implements Runnable {
 
                         JSONObject jsonObject = new JSONObject();
 
-                                Command command = Command.valueOf(rawCommand.toUpperCase());
+                        Command command = Command.valueOf(rawCommand.toUpperCase());
                         switch (command) {
                             case LIST_REQUESTS:
                                 int position = (int) received.get("position");
@@ -66,6 +69,20 @@ public class TcpConnectionService implements Runnable {
                                 }
 
                                 outputLine = jsonObject.toString();
+                                break;
+                            case LIST_TESTS:
+                                String uri = (String) received.get("uri");
+                                Optional<List<Test>> tests = urlMappingRepostitory.getUrlMapping(uri);
+
+                                if (tests.isPresent()) {
+                                    jsonObject = new JSONObject(tests.get());
+                                } else {
+                                    ErrorResponse errorResponse = ErrorResponse.builder()
+                                                                               .errorMessage("No tests for this URI :(")
+                                                                               .build();
+                                    jsonObject = new JSONObject(errorResponse);
+                                }
+
                                 break;
                             default:
                                 throw new NotImplementedException();
