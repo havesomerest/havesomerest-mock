@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MockRequestHandler extends ResourceHttpRequestHandler {
 
+    private static final boolean VERBOSE = false;
+
     private RequestRepository requestRepository;
 
     @Getter
@@ -32,7 +34,7 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        log.info(request.getHeaderNames().toString());
+        log.info("\n" + LocalDateTime.now() + "\n" + request.getRequestURI() + "\n");
 
         Map<String, String> headerByHeaderName = new HashMap<>();
         Enumeration requestHeaderNames = request.getHeaderNames();
@@ -40,7 +42,13 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
             String headerName = (String) requestHeaderNames.nextElement();
             String header = request.getHeader(headerName);
             headerByHeaderName.put(headerName, header);
-            log.info(headerName + ": " + header);
+            if (VERBOSE) {
+                log.info(headerName + ": " + header);
+            }
+        }
+
+        if (VERBOSE) {
+            log.info("\n");
         }
 
         String requestBody = "";
@@ -49,12 +57,10 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
                                  .lines()
                                  .collect(Collectors.joining(System.lineSeparator()));
 
-            StringBuilder sb = new StringBuilder();
-            sb.append(LocalDateTime.now() + "\n" + request.getRequestURI() + "\n");
-            sb.append("------------------------\n");
-            sb.append(requestBody + "\n");
-            sb.append("------------------------\n");
-            log.info(sb.toString());
+            if (VERBOSE) {
+                log.info(requestBody);
+            }
+
         }
 
         AcceptedRequest acceptedRequest = AcceptedRequest.builder()
