@@ -2,17 +2,16 @@ package hu.hevi.havesomerest.mock;
 
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 
 @Repository
 public class RequestRepository {
 
-    private List<AcceptedRequest> requests = new ArrayList<>();
+    private LinkedList<AcceptedRequest> requests = new LinkedList<>();
 
     public void save(AcceptedRequest acceptedRequest) {
-        requests.add(acceptedRequest);
+        requests.add(0, acceptedRequest);
     }
 
     public AcceptedRequest get(int i) {

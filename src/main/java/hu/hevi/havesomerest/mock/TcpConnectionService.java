@@ -88,20 +88,8 @@ public class TcpConnectionService implements Runnable {
                                 throw new NotImplementedException();
                         }
 
-//                if ("getrequests:".equals(command)) {
-//                    String urlMapping = inputLine.replace("getrequests:", "");
-//                    Optional<List<Test>> mapping = urlMappingRepostitory.getUrlMapping(urlMapping);
-//
-//                    AcceptedRequest acceptedRequest = requestRepository.get(0);
-//
-//                    JSONObject jsonObject = new JSONObject(acceptedRequest);
-//                    outputLine = jsonObject.toString();
-//                } else if (inputLine.startsWith("getrequest[")) {
-//
-//                } else {
-//                    //outputLine = inputLine.toUpperCase();
-//                }
                         out.println(outputLine);
+
                         if (inputLine.equals("Bye.")) {
                             log.info("Awesome Client says Good Bye to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
                             clientSocket.close();
