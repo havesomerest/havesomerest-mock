@@ -1,10 +1,10 @@
 package hu.hevi.havesomerest.mock;
 
-import hu.hevi.havesomerest.test.Test;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,8 +12,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
-import java.util.Optional;
 
 @Component
 @Slf4j
@@ -34,40 +32,75 @@ public class TcpConnectionService implements Runnable {
 
             log.info("A socket for the Glorious Terminal has been initialized on port: " + serverSocket.getLocalPort());
 
-            Socket clientSocket = serverSocket.accept();
-            log.info("Awesome Client has connected to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
-            PrintWriter out =
-                    new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
-
-
             String inputLine, outputLine = "";
 
-            while ((inputLine = in.readLine()) != null) {
-                log.info("Interesting news! " + clientSocket.getRemoteSocketAddress() + " has just announced: " + inputLine);
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                try {
+                    log.info("Awesome Client has connected to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
+                    PrintWriter out =
+                            new PrintWriter(clientSocket.getOutputStream(), true);
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(clientSocket.getInputStream()));
 
-                if (inputLine.startsWith("getrequest:")) {
-                    String urlMapping = inputLine.replace("getrequests:", "");
-                    Optional<List<Test>> mapping = urlMappingRepostitory.getUrlMapping(urlMapping);
-                    if (mapping.isPresent()) {
-                        List<Test> tests = mapping.get();
-                        Test test = tests.get(0);
-                        outputLine = new JSONObject(test).toString();
+                    while ((inputLine = in.readLine()) != null) {
+                        log.info("Interesting news! " + clientSocket.getRemoteSocketAddress() + " has just announced: " + inputLine);
+
+                        JSONObject received = new JSONObject(inputLine);
+                        String rawCommand = (String) received.get("command");
+
+                        JSONObject jsonObject = new JSONObject();
+
+                                Command command = Command.valueOf(rawCommand.toUpperCase());
+                        switch (command) {
+                            case LIST_REQUESTS:
+                                int position = (int) received.get("position");
+                                try {
+                                    AcceptedRequest acceptedRequest = requestRepository.get(position);
+                                    jsonObject = new JSONObject(acceptedRequest);
+                                } catch (IndexOutOfBoundsException e) {
+                                    ErrorResponse errorResponse = ErrorResponse.builder()
+                                                                               .errorMessage("Index out of bounds!")
+                                                                               .build();
+                                    jsonObject = new JSONObject(errorResponse);
+                                }
+
+                                outputLine = jsonObject.toString();
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+
+//                if ("getrequests:".equals(command)) {
+//                    String urlMapping = inputLine.replace("getrequests:", "");
+//                    Optional<List<Test>> mapping = urlMappingRepostitory.getUrlMapping(urlMapping);
+//
+//                    AcceptedRequest acceptedRequest = requestRepository.get(0);
+//
+//                    JSONObject jsonObject = new JSONObject(acceptedRequest);
+//                    outputLine = jsonObject.toString();
+//                } else if (inputLine.startsWith("getrequest[")) {
+//
+//                } else {
+//                    //outputLine = inputLine.toUpperCase();
+//                }
+                        out.println(outputLine);
+                        if (inputLine.equals("Bye.")) {
+                            log.info("Awesome Client says Good Bye to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
+                            clientSocket.close();
+                            break;
+                        }
+                        inputLine = null;
+
                     }
-                } else if (inputLine.startsWith("getrequest[")) {
-
-                } else {
-                    outputLine = inputLine.toUpperCase();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                out.println(outputLine);
-                if (inputLine.equals("Bye."))
-                    log.info("Awesome Client says Good Bye to the Glorious Terminal! " + clientSocket.getRemoteSocketAddress());
-                    clientSocket.close();
-                    break;
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            log.info("ByeByeFinally");
         }
     }
 }

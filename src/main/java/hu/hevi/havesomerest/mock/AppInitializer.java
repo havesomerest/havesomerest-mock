@@ -27,6 +27,8 @@ public class AppInitializer extends SimpleUrlHandlerMapping {
     private ToTestConverter toTestConverter;
     @Autowired
     private EndPointNameBuilder endPointNameBuilder;
+    @Autowired
+    private RequestRepository requestRepository;
 
     @Override
     public void initApplicationContext() throws BeansException {
@@ -46,7 +48,7 @@ public class AppInitializer extends SimpleUrlHandlerMapping {
                 MockRequestHandler requestHandler = (MockRequestHandler) urlMap.get(endPoint);
                 requestHandler.addTest(test);
             } else {
-                urlMap.put(endPoint, new MockRequestHandler(test));
+                urlMap.put(endPoint, new MockRequestHandler(requestRepository, test));
             }
         });
 

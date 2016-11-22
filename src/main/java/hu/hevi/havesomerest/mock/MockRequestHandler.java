@@ -3,7 +3,6 @@ package hu.hevi.havesomerest.mock;
 import hu.hevi.havesomerest.test.Test;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
@@ -20,19 +19,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MockRequestHandler extends ResourceHttpRequestHandler {
 
-    @Autowired
     private RequestRepository requestRepository;
 
     @Getter
     private List<Test> tests = new ArrayList<>();
 
-    public MockRequestHandler(Test test) {
+    public MockRequestHandler(RequestRepository requestRepository, Test test) {
+        this.requestRepository = requestRepository;
         this.tests.add(test);
     }
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
 
         log.info(request.getHeaderNames().toString());
 
