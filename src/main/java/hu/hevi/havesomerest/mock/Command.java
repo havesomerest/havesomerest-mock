@@ -2,6 +2,7 @@ package hu.hevi.havesomerest.mock;
 
 public enum Command {
 
-    LIST_REQUESTS,
-    LIST_TESTS
+    GET_TESTS,
+    GET_REQUEST,
+    GET_REQUESTS
 }

@@ -54,10 +54,15 @@ public class TcpConnectionService implements Runnable {
 
                         JSONObject jsonObject = new JSONObject();
 
+                        int position = 0;
                         Command command = Command.valueOf(rawCommand.toUpperCase());
                         switch (command) {
-                            case LIST_REQUESTS:
-                                int position = (int) received.get("position");
+                            case GET_REQUEST:
+                                if (received.has("position")) {
+                                    position = (int) received.get("position");
+                                } else {
+                                    position = 0;
+                                }
                                 try {
                                     AcceptedRequest acceptedRequest = requestRepository.get(position);
                                     jsonObject = new JSONObject(acceptedRequest);
@@ -70,7 +75,7 @@ public class TcpConnectionService implements Runnable {
 
                                 outputLine = jsonObject.toString();
                                 break;
-                            case LIST_TESTS:
+                            case GET_TESTS:
                                 String uri = (String) received.get("uri");
                                 Optional<List<Test>> tests = urlMappingRepostitory.getUrlMapping(uri);
 
