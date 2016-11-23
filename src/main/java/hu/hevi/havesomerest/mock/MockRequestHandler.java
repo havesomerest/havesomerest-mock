@@ -63,7 +63,13 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
 
         }
 
+        String uri = tests.get(0).getEndpointParts()
+                          .stream()
+                          .map(endpointPart -> endpointPart.toString())
+                          .collect(Collectors.joining("/"));
+
         AcceptedRequest acceptedRequest = AcceptedRequest.builder()
+                                                         .uri(uri)
                                                          .requestHeaders(headerByHeaderName)
                                                          .requestBody(requestBody)
                                                          .build();

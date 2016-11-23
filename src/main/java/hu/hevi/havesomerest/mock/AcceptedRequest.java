@@ -9,6 +9,7 @@ import java.util.Map;
 @Builder
 public class AcceptedRequest {
 
+    private String uri;
     private Map<String, String> requestHeaders;
     private String requestBody;
 }
