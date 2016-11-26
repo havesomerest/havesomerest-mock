@@ -36,31 +36,13 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
 
         log.info("\n" + LocalDateTime.now() + "\n" + request.getRequestURI() + "\n");
 
-        Map<String, String> headerByHeaderName = new HashMap<>();
-        Enumeration requestHeaderNames = request.getHeaderNames();
-        while (requestHeaderNames.hasMoreElements()) {
-            String headerName = (String) requestHeaderNames.nextElement();
-            String header = request.getHeader(headerName);
-            headerByHeaderName.put(headerName, header);
-            if (VERBOSE) {
-                log.info(headerName + ": " + header);
-            }
-        }
-
-        if (VERBOSE) {
-            log.info("\n");
-        }
+        Map<String, String> headerByHeaderName = getHeadersByHeaderName(request);
 
         String requestBody = "";
         if ("POST".equalsIgnoreCase(request.getMethod())) {
             requestBody = request.getReader()
                                  .lines()
                                  .collect(Collectors.joining(System.lineSeparator()));
-
-            if (VERBOSE) {
-                log.info(requestBody);
-            }
-
         }
 
         String uri = tests.get(0).getEndpointParts()
@@ -102,6 +84,20 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
 
             out.flush();
         }
+    }
+
+    private Map<String, String> getHeadersByHeaderName(HttpServletRequest request) {
+        Map<String, String> headerByHeaderName = new HashMap<>();
+        Enumeration requestHeaderNames = request.getHeaderNames();
+        while (requestHeaderNames.hasMoreElements()) {
+            String headerName = (String) requestHeaderNames.nextElement();
+            String header = request.getHeader(headerName);
+            headerByHeaderName.put(headerName, header);
+            if (VERBOSE) {
+                log.info(headerName + ": " + header);
+            }
+        }
+        return headerByHeaderName;
     }
 
     public void addTest(Test test) {
