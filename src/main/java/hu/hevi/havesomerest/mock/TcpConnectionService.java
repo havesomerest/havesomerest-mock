@@ -2,6 +2,7 @@ package hu.hevi.havesomerest.mock;
 
 import hu.hevi.havesomerest.test.Test;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,36 @@ public class TcpConnectionService implements Runnable {
                                 try {
                                     AcceptedRequest acceptedRequest = requestRepository.get(position);
                                     jsonObject = new JSONObject(acceptedRequest);
+                                } catch (IndexOutOfBoundsException e) {
+                                    ErrorResponse errorResponse = ErrorResponse.builder()
+                                                                               .errorMessage("Index out of bounds!")
+                                                                               .build();
+                                    jsonObject = new JSONObject(errorResponse);
+                                }
+
+                                outputLine = jsonObject.toString();
+                                break;
+                            case GET_REQUESTS:
+                                boolean withBody = false;
+                                if (received.has("withBody")) {
+                                    withBody = (boolean) received.get("withBody");
+                                }
+                                try {
+                                    List<AcceptedRequest> acceptedRequests = requestRepository.getRequests(withBody);
+                                    JSONArray jsonArray = new JSONArray();
+                                    acceptedRequests.forEach(acceptedRequest -> {
+                                        JSONObject acceptedRequestResponse = new JSONObject();
+                                        acceptedRequestResponse.put("uri", acceptedRequest.getUri());
+                                        acceptedRequestResponse.put("headers", acceptedRequest.getRequestHeaders());
+                                        acceptedRequestResponse.put("body", acceptedRequest.getRequestBody());
+                                        jsonArray.put(acceptedRequestResponse);
+
+                                    });
+
+
+                                    jsonObject = new JSONObject();
+                                    jsonObject.put("requests", jsonArray);
+
                                 } catch (IndexOutOfBoundsException e) {
                                     ErrorResponse errorResponse = ErrorResponse.builder()
                                                                                .errorMessage("Index out of bounds!")
