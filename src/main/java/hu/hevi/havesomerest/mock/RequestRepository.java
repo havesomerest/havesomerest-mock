@@ -24,7 +24,6 @@ public class RequestRepository {
         List<AcceptedRequest> returnValue = new ArrayList<>();
         requests.forEach(request -> {
             if (withBody && request.getRequestBody() != null && !"".equals(request.getRequestBody().trim())) {
-                System.out.println(request.toString());
                 returnValue.add(request);
             }
         });
