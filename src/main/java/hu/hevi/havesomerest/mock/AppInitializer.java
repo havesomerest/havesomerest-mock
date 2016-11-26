@@ -6,7 +6,6 @@ import hu.hevi.havesomerest.io.StructureReader;
 import hu.hevi.havesomerest.io.TestDirectory;
 import hu.hevi.havesomerest.test.Test;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,7 +39,7 @@ public class AppInitializer extends SimpleUrlHandlerMapping {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Map<Test, JSONObject> tests = toTestConverter.convert(filesByDirectory);
+        Map<Test, String> tests = toTestConverter.convert(filesByDirectory);
 
         tests.keySet().forEach(test -> {
             String endPoint = endPointNameBuilder.build(test.getEndpointParts());
