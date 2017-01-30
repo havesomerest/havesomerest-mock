@@ -75,7 +75,15 @@ public class MockRequestHandler extends ResourceHttpRequestHandler {
                     response.setHeader(key, test.getResponseHeaders().get(key).get(0));
                 });
             }
-            response.setContentType("application/json");
+
+            switch (test.getFileType()) {
+                case XML:
+                    response.setContentType("application/xml");
+                    break;
+                case JSON:
+                    response.setContentType("application/json");
+                    break;
+            }
             response.setStatus(Integer.valueOf(test.getStatusCode()));
             PrintWriter out = response.getWriter();
             if (test.hasResponse()) {
